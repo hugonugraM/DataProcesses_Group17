@@ -10,10 +10,9 @@ social sciences: world happiness
 
 # Domain related projects
 
-## First project
+## Main project
 
-The first project is about [wold happiness](https://www.kaggle.com/unsdsn/world-happiness). This [project](https://www.kaggle.com/vamsikrishna/happiness-index-and-terrorism) investigate the relationship between index of happiness and terrorism, by combining two different datasets : one related to world happiness and the other is related to terrorist attacks worldwide between 1970-2016
-Link: https://www.kaggle.com/vamsikrishna/happiness-index-and-terrorism
+The main project that we are going to work on is [world happiness](https://www.kaggle.com/unsdsn/world-happiness). The dataset would be of 2017. it gives the happiness rank and happiness score of 155 countries around the world based on seven factors including family, life expectancy, economy, generosity, trust in government, freedom, and dystopia residual.
 
 ## Second project
 
@@ -31,3 +30,20 @@ link: https://www.kaggle.com/niyamatalmass/who-takes-the-loan)
 
 
 + Does exist a correlation between the life expectancy and the happiness of a country?
+
+
+# Datasets
+
+3 datasets given above can be described as follows:
+
+## 1st Dataset 
+
+.
+
+## 2nd Dataset
+
+*Suicide Rates Overview 1985 to 2016* Link:https://www.kaggle.com/russellyates88/suicide-rates-overview-1985-to-2016
+
+This dataset is created from four other datasets linked by time and place, and was built to find possible correlations among suicide rates and different cohorts across the socio-economic spectrum. The dataset is constructed using *World Bank Dataset* and its terms of use (license) comprises of *Creative Commons Attribution 4.0 International License (CC BY 4.0)*, under which the use of the data is permitted given that the source of data should also be provided.
+
+The dataset contains 27820 observations of 12 different features and some of these features are *age*, *population*, *country*, *gdp* and *generation*. Thus, some of the **questions** to ask about this dataset might be **"Which generation belonging to which country is more likely to commit suicide?"** or **Is there any relation between a country's economic strength(gdp) and its citizens likelihood of committing suicide?**.
