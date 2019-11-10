@@ -25,3 +25,8 @@ link: https://www.kaggle.com/russellyates88/suicide-rates-overview-1985-to-2016
 The third project that we found is [Who takes the loan?](https://www.kaggle.com/niyamatalmass/who-takes-the-loan) that is using the dataset  [Country Statistics - UNData](https://www.kaggle.com/sudalairajkumar/undata-country-profiles/kernels). This project is interesting because shows which are the the sectors of economy that are earning more money in relation with the others and at the same time is doing an analysis of several variables in countries like as unemployement rate. one of the parts that we enjoyed the most was the ranking of which countries need more help, so these were some of the reasons for taking this project as one the related ones.
 
 link: https://www.kaggle.com/niyamatalmass/who-takes-the-loan)
+
+# Questions
+
+
++ Does exist a correlation between the life expectancy and the happiness of a country?
