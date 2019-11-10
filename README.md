@@ -31,15 +31,20 @@ link: https://www.kaggle.com/niyamatalmass/who-takes-the-loan)
 
 
 + Does exist a correlation between the life expectancy and the happiness of a country?
-+ 
++ Is there any relation between a country's economic strength(gdp) and its citizens likelihood of committing suicide?
 
 # Datasets
 
 3 datasets given above can be described as follows:
 
-## 1st Dataset 
+## 1st Dataset
 
-.
+*World Happiness Report* Link:https://www.kaggle.com/unsdsn/world-happiness
+
+This dataset was released at the United Nations at an event celebrating International Day of Happiness on March 20th and is a job done by person that come from leading experts across fields – economics, psychology, survey analysis, national statistics, health, public policy and more. The report review the state of happiness in the world today and show how the new science of happiness explains personal and national variations in happiness.
+
+The dataset contains 155 observations of 12 different features. and some of these features are *
+Happiness.Score*, *Generosity*, *Freedom*, *Life expectancy* and more. Thus, some of the **questions** to ask about this dataset might be **"Does exist a correlation between the life expectancy and the happiness of a country?**.
 
 ## 2nd Dataset
 
