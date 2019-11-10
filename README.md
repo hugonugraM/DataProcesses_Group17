@@ -6,9 +6,13 @@ A good aspect of social sciences are the amount of available resources that can 
 
 ## selected domain
 
-social sciences: world hapiness
+social sciences: world happiness
 
 # Domain related projects
+
+## Main project
+
+The main project that we are going to work on is [world happiness](https://www.kaggle.com/unsdsn/world-happiness). The dataset would be of 2017. it gives the happiness rank and happiness score of 155 countries around the world based on seven factors including family, life expectancy, economy, generosity, trust in government, freedom, and dystopia residual.
 
 ## Second project
 
