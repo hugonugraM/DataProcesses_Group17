@@ -10,9 +10,10 @@ social sciences: world happiness
 
 # Domain related projects
 
-## Main project
+## First project
 
-The main project that we are going to work on is [world happiness](https://www.kaggle.com/unsdsn/world-happiness). The dataset would be of 2017. it gives the happiness rank and happiness score of 155 countries around the world based on seven factors including family, life expectancy, economy, generosity, trust in government, freedom, and dystopia residual.
+The first project is about [wold happiness](https://www.kaggle.com/unsdsn/world-happiness/). This [project](https://www.kaggle.com/vamsikrishna/happiness-index-and-terrorism/) investigate the relationship between index of happiness and terrorism, by combining two different datasets : one related to world happiness and the other is related to terrorist attacks worldwide between 1970-2016. 
+Link: https://www.kaggle.com/vamsikrishna/happiness-index-and-terrorism
 
 ## Second project
 
@@ -30,7 +31,7 @@ link: https://www.kaggle.com/niyamatalmass/who-takes-the-loan)
 
 
 + Does exist a correlation between the life expectancy and the happiness of a country?
-
++ 
 
 # Datasets
 
