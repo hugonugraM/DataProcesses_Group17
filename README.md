@@ -12,7 +12,7 @@ social sciences: world happiness
 
 ## First project
 
-The first project is about [wold happiness](https://www.kaggle.com/unsdsn/world-happiness). This [project](https://www.kaggle.com/vamsikrishna/happiness-index-and-terrorism) investigate the relationship between index of happiness and terrorism, by combining two different datasets : one related to world happiness and the other related to terrorist attacks worldwide between 1970-2016
+The first project is about [wold happiness](https://www.kaggle.com/unsdsn/world-happiness). This [project](https://www.kaggle.com/vamsikrishna/happiness-index-and-terrorism) investigate the relationship between index of happiness and terrorism, by combining two different datasets : one related to world happiness and the other is related to terrorist attacks worldwide between 1970-2016
 Link: https://www.kaggle.com/vamsikrishna/happiness-index-and-terrorism
 
 ## Second project
