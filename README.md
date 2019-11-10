@@ -4,9 +4,9 @@ We have chosen the social sciences domain, and our goal is to discover which are
 
 A good aspect of social sciences are the amount of available resources that can be found on internet that would improve our analysis. So with this we could take data from different sources and get data from very different angles like as the GDP per country or the military expenses per country.
 
-## selected domain
+## Selected Domain
 
-social sciences: world happiness
+Social Sciences: World Happiness
 
 # Domain related projects
 
@@ -20,7 +20,7 @@ Link: https://www.kaggle.com/vamsikrishna/happiness-index-and-terrorism
 
 Another project related with the countries wellness measure is about Suicide Rates from the year 1985 to 2016. This dataset can be found [here](https://www.kaggle.com/russellyates88/suicide-rates-overview-1985-to-2016) and the project that aims to compare socio-economic info with the given suicide rates is given [here](https://www.kaggle.com/lmorgan95/r-suicide-rates-in-depth-stats-insights/data). In the project, using several different charts like faceted bar, faceted line and faceted scatter plots; several results are found such as the suicide rates are decreasing globally as the year increases and the suicide rates generally increase with the age.
 
-link: https://www.kaggle.com/russellyates88/suicide-rates-overview-1985-to-2016
+link: https://www.kaggle.com/lmorgan95/r-suicide-rates-in-depth-stats-insights/data
 
 ## Third project
 
