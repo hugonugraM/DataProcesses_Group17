@@ -1,0 +1,393 @@
+---
+title: "An Analysis for the Suicides Across the World"
+author: |
+  | DATA PROCESSES FINAL PROJECT
+  | UPM Facultad de Informatica
+  | Raymond Banks, Houda Briwa, Emre Hangül, Fatemeh Mohammadi, Hugo Nugra
+date: "20 12 2019"
+output: 
+  rmdformats::readthedown:
+    lightbox: true
+    gallery: false
+    highlight: tango
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+library(magrittr)
+library(tidyverse)
+library(dplyr)
+library(DT)
+library(knitr)
+library(kableExtra)
+library(scales)
+library(pander)
+library(plotly)
+library(caret)
+opts_chunk$set(warning = FALSE)
+```
+
+<style type="text/css">
+
+body{ /* Normal  */
+      font-size: 15px;
+  }
+td {  /* Table  */
+  font-size: 14px;
+}
+h1.title {
+  font-size: 32px;
+  color: DarkBlue;
+}
+h1 { /* Header 1 */
+  font-size: 22px;
+  color: DarkBlack;
+}
+h2 { /* Header 2 */
+    font-size: 22px;
+  color: DarkBlack;
+}
+h3 { /* Header 3 */
+  font-size: 22px;
+  font-family: "Times New Roman", Times, serif;
+  color: DarkBlack;
+}
+code.r{ /* Code block */
+    font-size: 12px;
+}
+pre { /* Code block - determines code spacing between lines */
+    font-size: 14px;
+}
+
+#table-of-contents h2{
+    background-color:#0099FF;
+}
+
+</style>
+
+```{r pictureUPM,echo=FALSE, fig.align='center',out.width="50%"}
+include_graphics("upm.jpg")
+```
+
+```{r readData, include=FALSE}
+#read csv data file
+dataset <- read.csv("suicide_data.csv", stringsAsFactors = FALSE)
+
+#change the column name that contains non-alphanumeric characters
+colnames(dataset)[1]="country"
+```
+               
+# Abstract
+
+> *In this study, the suicide rates of several countries around the worlwide are examined through some of the features like GDP of the countries, suicide numbers by generations and suicide numbers by sex. The analysis is done using several data visualizations and multiple linear regression model. At the end, a predictive model is constructed to be able to predict suicide rates by new data. The results showed that the generation, gender and the continent of a person affect that individual's probability of committing suicide significantly.* 
+
+
+# Introduction and Related Work
+
+It is no secret that a person becomes inclined to commit suicide for different reasons that directly or indirectly affects her/his life. One may think of several reasons for committing suicide; such as being lonely, being poor, living in a bad environment or living in an uncivilized society. In a recently published online article, it is shown that the males do commit suicide more than the females and it might depend on several factors like cultural expectation for men or being unmarried [1]. Such answers and claims may thought to be the general reasons of committing suicide, but to actually prove the correlation and association between different features, there has to be a statistical inferences with a data that carry some possible information about those inferences. Thus, throughout this study, the statistical learning tools like data visualization and multiple linear regression model will be used to detect some correlations between suicide rates and other possible independent features.
+
+Before getting into the study, some literature review is done about the topic at hand. There are several works published online related with the suicide rates across the world, and some of these works can be seen below:
+
+Happiness Suicide Paradox:
+https://www.andrewoswald.com/docs/revjebodalyaprilsuicide2011.pdf
+
+Visualizing Suicide Rates and World Happiness: 
+https://towardsdatascience.com/visualizing-suicide-rates-and-world-happiness-bc4e6411732f
+
+Happiness, Unhappiness, and Suicide: An Empirical Assessment
+https://academic.oup.com/jeea/article-abstract/7/2-3/539/2296010
+
+Happier Countries Are More Suicidal: 
+https://medium.com/@dtg319/happier-countries-are-more-suicidal-a-look-at-the-world-happiness-report-and-suicide-d5f44f69ce8e
+
+The paradox of 'suicide in happy places' seems not to exist: 
+https://medicalxpress.com/news/2018-09-paradox-suicide-happy.html
+
+# Exploratory Data Analysis
+
+## Dataset
+
+The dataset chosen for this study is related with the *Suicide Rates* across the countries worlwide. This dataset can be accessed *[here](https://www.kaggle.com/russellyates88/suicide-rates-overview-1985-to-2016).* The data has a total of `r length(unique(dataset$country))` distinct countries and there are multiple records for each country that show suicides per year, per gender and per age information. In total, there are *27820* observations of *12* features and some of the pertinent features are number of suicides, sex, age, year, population of the countries, gdp and gdp per capita of the countries, Human Development Index (HDI) value for the countries and the generations which people belong to. From these fields, some of the ones that are thought to be redundant are removed and some of the names of the fields are changed. Furthermore, a different column named "continent" is added that shows the respective continents of the countries which will be used in the study. After such data preprocessing tasks are applied, the resulting dataset has **9** features which can be seen below.
+
+```{r suicideRatesData}
+
+#convert gdp values from character into numeric 
+dataset$gdp_for_year.... <- as.numeric(gsub(",","",dataset$gdp_for_year....))
+
+#remove redundant fields
+dataset <- select(dataset,-c(4,7,8,9))
+
+#rename badly-named columns
+dataset <- rename(dataset,
+                  suicides="suicides_no",
+                  gdp="gdp_for_year....",
+                  gdp_capita="gdp_per_capita....")
+
+
+# get continent data from the package countrycode
+dataset$continent <- countrycode::countrycode(dataset[, "country"],
+                                              origin = "country.name",
+                                              destination = "continent")
+
+#output a table of the dataset, first 5000 rows
+head(dataset,5000) %>%  datatable(rownames=FALSE,
+                                  caption="The dataset to be used throughout this study", 
+                                  options = list(lengthMenu=c(5,10,20,50),
+                                  scrollX=TRUE,
+                                  initComplete = JS(
+    "function(settings, json) {",
+    "$(this.api().table().header()).css({'background-color': '#CCF', 'color': '#000'});",
+    "}")))
+```
+
+## Visualizations
+
+Before starting on the statistical analysis, several visualizations are constructed to have a better understanding of the data in order to have a preliminary idea for some of the questions that may arise from that data. The current dataset carries several variables that a researcher might be interested in the possible *relationships* or *correlations* between them, such as continent, sex, suicides, gdp per capita and Generation. Several graphics are created to explore such possible relationships, namely box-plots, bar charts and scatter plots. These visualizations are given below.
+
+The first visualizations at hand are created to explore the trends about suicide numbers worlwide. The first plot below is a bar chart that shows the total suicide numbers by continents over the whole dataset. It can be seen that the most of the suicides happen in Europe, Americas and Asia. In the second plot, the suicide numbers by continents can be seen by their values over the time frame of the dataset which is between 1985 and 2016. The trends show that the suicide numbers vary between continents. For instance, while Europe and Asia seem to have a great variation in  their suicide numbers over the years (with several increases and descreases), the changes in suicide numbers in Americas seem to be much less. 
+
+```{r suicideByContinent}
+
+#suicide numbers by continent
+dataset %>%
+  select(continent,suicides) %>% 
+  group_by(continent) %>% 
+  summarize(suicides=sum(suicides)) %>% 
+  ggplot(aes(x = reorder(continent,suicides), y = suicides, fill=reorder(continent,-suicides))) + 
+  geom_bar(stat = "identity") + 
+  theme_light() +
+  labs(y="Number of Suicides",
+       x=NULL,
+       fill="Continents") +
+  scale_y_continuous(labels = comma) +
+  coord_flip()
+
+#suicide trends by continent over time
+dataset %>% 
+  select(year,continent,suicides) %>% 
+  group_by(continent,year) %>% 
+  summarize(suicide_per_year=sum(suicides)) %>% 
+  ggplot(aes(x = year, y = suicide_per_year, col = factor(continent))) + 
+  facet_grid(continent ~ ., scales = "free_y") + 
+  geom_line() + 
+  theme_light() +
+  geom_point() + 
+  labs(title = "Suicidal Trends by Continent over Time", 
+       color = "Continent",
+       x= "Year",
+       y="Total Number of Suicides") + 
+  theme(strip.text.y = element_blank()) + 
+  scale_x_continuous(breaks = seq(1985, 2015, 5)) +
+  scale_y_continuous(labels=comma)
+```
+
+
+The next plot is a bar plot that also shows the suicide numbers by continent, but this time, including the differentiation by the gender. From the chart, it can be seen that in every country, males commit suicide significantly more than the females.
+
+```{r}
+
+#suicides by the regions and gender
+dataset %>%
+  select(continent,sex,suicides) %>% 
+  group_by(continent,sex) %>% 
+  summarize(suicide=sum(suicides)) %>% 
+  ggplot(aes(x = reorder(continent,suicide), y = suicide, fill=sex)) + 
+  geom_bar(stat = "identity",position = "dodge") + 
+  geom_line(aes(group=sex,col=sex),size=1.2) +
+  theme_light() +
+  labs(y="Number of Suicides",
+       x=NULL,
+       fill="Gender") +
+  scale_fill_manual(values=c("#330000","#0066CC"),labels=c("Female","Male")) +
+  scale_colour_manual(values=c("#99FF00","#FF6600"),guide="none") +
+  scale_y_continuous(breaks = seq(300000,3000000,300000),labels = comma) +
+  theme(text = element_text(size=10),
+        axis.text.x = element_text(angle=90, hjust=1)) 
+```
+
+The other suicide trends plot can be constructed using the differentiation by the generations. The faceted grid graph below shows the suicidal rates (per 1 million people) change over the years by generation. It can be seen that the highest suicidal rates belong to the oldest generation (G.I. Generation) and the lowest suicidal rates belong to the newest generation (Generation Z) and all of the other generations are conversely-ordered as well. 
+
+```{r} 
+#suicidal trends by generation over the years
+dataset %>% 
+  select(year,generation,suicides,sex,population) %>% 
+  group_by(generation,year) %>% 
+  summarize(suicide_per_million=(sum(suicides)/sum(population))*1000000) %>% 
+  ggplot(aes(x = year, y = suicide_per_million, col = reorder(factor(generation),-suicide_per_million))) + 
+  facet_grid(reorder(generation,-suicide_per_million) ~ ., scales = "free_y") + 
+  geom_line() + 
+  geom_point() + 
+  theme_light() +
+  labs(title = "Suicidal Trends by Generation over Time", 
+       x = "Year", 
+       y = "Suicide Rate (Per Million)", 
+       color = "Generations") + 
+  theme(strip.text.y = element_blank()) + 
+  scale_x_continuous(breaks = seq(1985, 2015, 5)) +
+  scale_y_continuous(labels=comma)
+
+```
+
+It is another point of interest that there might be a relationship with the economic strength of a country and the suicide rates of that country. To do this, the dataset is aggregated and several *income levels* are defined. These levels indicate countries with per capita income levels such as *very low*, *low*, *average*, *high* or *very high*. The break levels for the per capita income groups are defined arbitrarily as 10000,20000,30000 and 40000.  
+
+In the plot below, the y axis shows the number of suicides for a country and x axis shows the per capita income values of that country with the defined economic strength levels. It can be seen that the black smoothing line shows an increase in suicides while the gdp per capita numbers increase from "low" to "high" income, but then the number of suicides start to decrease as the per capita numbers approach from "high" to "very high" income interval.
+
+```{r scatterPlot2, fig.cap="Scatter plot showing relationships between suicide numbers - per capita income"}
+
+#create an aggregated subset of the data for the line plots
+d <- dataset %>%
+  select(country,gdp_capita,suicides,year) %>% 
+  group_by(country,year) %>% 
+  summarize(suicides=sum(suicides),
+            gdp_capita=max(gdp_capita)) 
+
+#construct gdp per capita intervals as a vector
+Economic_Strength <- ifelse(d$gdp_capita>40000,"Very High",
+       ifelse(d$gdp_capita<=40000 & d$gdp_capita>30000,"High",
+              ifelse(d$gdp_capita<=30000 & d$gdp_capita>20000,"Average",
+                     ifelse(d$gdp_capita<=20000 & d$gdp_capita>10000,"Low",
+                            ifelse(d$gdp_capita<=10000,"Very Low",NA)))))
+
+#combine created vector with the dataset
+d$Economic_Strength <- Economic_Strength
+
+#suicide rates by the countries according to gdp
+ggplotly(d %>% 
+  ggplot(aes(y = suicides, x = gdp_capita)) + 
+  geom_point(aes(col=reorder(Economic_Strength,gdp_capita)),size=0.8) +
+  geom_smooth(method = "loess", se=FALSE, col="#003333") +
+  labs(y="Number of Suicides",
+       x="GDP Per Capita Income",
+       col="Income Levels") +
+  scale_x_continuous(labels=comma) +
+  scale_y_continuous(labels=comma, breaks = seq(5000,65000,5000)) +
+  theme_light()) 
+
+#remove the created subset of the data
+rm(d,Economic_Strength)
+```
+
+# Methods and Results
+
+In this section, the variables like generation, continent, gdp_capita and sex will be used as *independent* possible predictor variables and the variable ***suicides*** will be used as the *dependent* possible response variable. Since the outcome of interest variable, (number of) suicides, is a numeric variable, the statistical model that will be used is the *multiple linear regression* model. 
+
+The initial regression model will be constructed using "suicides" as the response variable and other variables **except** "country" and "year" as the possible predictor variables. This initial model and the result of it are as follows:
+
+```{r firstModel}
+#construct the initial model
+model1 <- lm(suicides~.-country-year,dataset)
+summary(model1) %>% pander::pander()
+```
+
+From the summary of the initial regression model above, it can be seen that R automatically creates dummy variables for the categorical variables. In this case, the dummy variable for the sex variable is *sexMale* (or base variable as sexFemale), the base variable for generation is *generationBoomer* and the base variable for the continent is *continentAfrica*. 
+
+The first thing to explore about this model is to decide whether *at least one* of the independent variables is significant in terms of predicting the outcome, which means that the null hypothesis ( $H_0 : \beta_1 = \beta_2 = ... = \beta_n = 0$ , where $\beta_{1,2,...,n}$ are the coefficient estimates for the variables) should be rejected in favor of the alternate hypothesis. This result can be seen by the *F-Statistic* and the corresponding p-value for it. The F-Statistic and the p-value upwards are the results of *Analysis of Variance (ANOVA) test* where the model with several predictor variables are compared against the model with *zero* predictor variable. The result of this test that is given below indicates that since the specific p-value is considerably less than 0, it is said that the null hypothesis is rejected in the favor of alternate hypothesis which means there is at least one predictor variable that is statistically significant (useful).
+
+```{r anovaInitial}
+#ANOVA test for the initial hypothesis
+anova(update(model1,~1),model1) %>% pander::pander()
+```
+
+Furthermore, the next question of interest is to decide which variables may be useful for the regression model. This means that how much and to what extent the independent variables are correlated with the response variable. The *strength* of the relationship between the dependent variable *suicides* and other independent variables can be seen via *p-values* from the results. We can infer from the p-values given below that the variables *sex*, *population*, dummy variables for generations *X,Z,Millenials* and dummy variables for continents *Asia, Europe and Oceania* are *statistically significant* variables.
+
+```{r pvalsInitialModel}
+#p values for variables
+summary(model1)$coef[,c(1,4)] %>% pander::pander()
+```
+
+The magnitudes of the relationships between significant variables and the number of suicides are related with how much of a 1 unit change in these variables would effect the suicide number which can be seen by the *coefficients* of these variables. For instance, the coefficient of the dummy variable "sexMale" is *`r model1$coefficients[2] %>% round(2)`*, which means that while controlling for other variables like generation and continent, the suicide numbers for a male is `r model1$coefficients[2] %>% round(2)` more than a female *on average*. Moreover, keeping (controlling) other variables constant, the suicide numbers for the Europe is *`r model1$coefficients[13] %>% round(2)`* more than the Africa on average.
+
+Another property to look for in the results of the regression model is the *goodness of fit* of the model to the dataset. The measures for the goodness of fit of a model are *F-Statistic*, *Residual Standard Error* and *Adjusted $R^2$ Value*. These values are `r summary(model1)$fstatistic[1] %>% round(1)`, `r summary(model1)$sigma %>% round(1)` and `r summary(model1)$adj %>% round(3)` respectively. A rule of thumb approach says that Adjusted $R^2$ value below than 0.3 means a bad model fit, more than 0.3 but less than 0.7 means an average fit and more than 0.7 means a good fit. Thus, we may say the model fits averagely to the data and it is not a good model.
+
+From the results table, it is seen that some of the variables like "gdp" and "gdp_capita" have high p-values (more than 0.01 or 0.05 thresholds) like `r summary(model1)$coeff["gdp",4] %>% round(3)` and `r summary(model1)$coeff["gdp_capita",4] %>% round(3)`. These values imply that these variables are not significant in this model. This phenomenon might happen due to the *collinearity* between these variables or other variables *carrying* out the *"information"* that these variables carry. Thus, to further investigate which of these variables might be excluded or included into the final model, the process named *feature selection* should be done. There are several feature selection models in both statistics and detailed ones in Machine Learning. One of the most commonly used functions in R software for feature selection is *step* function. This function selects features by adding (forward), subtracting (backward) or both adding and subtracting features 1 by 1 to acquire the best possible performance for the model. The performance measure for the models are *Akaike Information Criterion* (AIC) and *Bayesian Information Criterion* (BIC). The result of the feature selection with these performance measures are given below.
+
+```{r featureSelection, fig.align='center'}
+
+#feature selection using AIC
+aicModel <- step(model1,trace = FALSE,direction = "both")
+
+#feature selection using BIC
+bicModel <- step(model1,k=log(nrow(dataset)),trace = FALSE,direction = "both")
+
+#compare 2 models and select the one with the lower BIC
+BIC(aicModel,bicModel) %>% kable()
+
+#set the bicModel as the best model
+bestModel <- bicModel
+```
+
+```{r bestModel}
+summary(bestModel) %>% pander()
+```
+
+It is found from using both of the measures that the best model is created by subtracting both the gdp and gdp_capita variables and leaving the rest. However, the increase in goodness of fit was slight since only the F-Statistic increased significantly to `r summary(bestModel)$f[1] %>% round(1)` and the adjusted $r^2$ value stayed almost the same compared to initial model with a value of `r summary(model1)$adj %>% round(4)`.
+
+## Predictions
+
+Using the best available model found, the next step for the regression model analysis is to check how great the model's ability to predict outcome variable really is. There are 2 different approaches for the model data and prediction data to be used in this study. The first approach is to divide the model into a 2 parts such that, for instance, 70% of the data will be in the model *training* dataset and the remaining 30% of the data will be in the *prediction* or *test* dataset. The second approach will be to use one of the most common cross-validation techniques, namely *k-fold cross-validation*. 
+
+The first model using training and test dataset technique is given below.
+
+```{r trainingSetMethod}
+#model creation using training and test data set
+trainData <- sample (nrow(dataset),nrow(dataset)*0.7)
+trainModel <- lm(suicides~.-country-year-gdp-gdp_capita ,dataset ,subset=trainData)
+
+#output summary of the table
+summary(trainModel) %>% pander()
+```
+
+After the model is created, the outcome variable "number of suicides" is predicted using the test dataset that is the 30% of the original data. The predictions using test data set is shown below.
+
+```{r predictionsTraining}
+
+#predict using test data and show the first 1000 results
+predict(bestModel, newdata = dataset[-trainData,],interval = "pred") %>% 
+  head(1000) %>% 
+  set_colnames(c("Predicted_Number_Of_Suicides","Upper_Pred_Int","Lower_Pred_Int")) %>% 
+  datatable(rownames=FALSE,
+                     caption="Number of predictions, upper and lower prediction levels", 
+                     options = list(lengthMenu=c(5,10,20,50),
+                     scrollX=TRUE,
+                     initComplete = JS(
+    "function(settings, json) {",
+    "$(this.api().table().header()).css({'background-color': '#CCF', 'color': '#000'});",
+    "}"))) 
+
+#root mean square error (RMSE)
+mean((dataset$suicides - predict(bestModel,dataset))[-trainData]^2) %>% sqrt %>% 
+  kable(col.names = "Root MSE by Train/Test Approach")
+```
+
+There are several accuracy methods that can be used for a quantitative outcome like Mean Squared Error(MSE), Root Mean Squared Error (RMSE) or Mean Absolute Error(MAE). Here the RMSE is chosen as the accuracy measure of the predictions. The RMSE value after the model that uses training and test data is **`r mean((dataset$suicides - predict(bestModel,dataset))[-trainData]^2) %>% sqrt %>% round(2) `.** 
+
+The second approach for the prediction modeling is to use k-fold cross validation technique. Simply, the data is divided into k-folds and the model is run k times, each time using k-1 folds as the training data and 1 fold as the data. This approach is generally preferable to simple training/test data divide since it prevents *overfitting* better. The most common k number is 10 which will also be 10 in this study. The predictions using k-fold cross validation is given below.
+
+```{r predictionsCrossVal}
+
+# k fold cross validation and the resulting error rate
+set.seed(2) 
+train.control <- trainControl(method = "cv", number = 10)
+
+# Train the model
+crossValModel <- train(suicides ~.-country-year-gdp-gdp_capita, dataset, method = "lm",
+               trControl = train.control)
+
+#output the results
+crossValModel$results %>% pander()
+```
+
+It can be sen that the RMSE value after the predictions are done using the 10-fold cross validations has decreased to `r crossValModel$results[2] %>% round(2)` when compared to a single training/test divide. This result is on par with the claim that the k-fold cross validation reduces the prediction error further than the single training/test dataset approach.
+
+# Discussion and Future Work
+
+In this study, the suicide rates across different countries of the world are examined according to different features like generation, gender, population, gdp or continent of the country. The features of the data are visualized through several visualization tools like bar plots, scatter plots and line plots. After some intuition about the data is acquired, the features that are thoguht to be relevant for predicting the outcome of number of suicides in a country are put into a multiple linear regression model. The result of the models showed that the generation, sex and the continent a specific person lives in significantly affect the possibility of that person to commit suicide. Such results were that the older generations, males and people living in 1st world countries like the ones in Europe and America have more likelihood of committing suicide. 
+
+The results and inferences of this study can be further used and extended in different social science studies like finding the reasons of why the older people commit suicides more or finding the reasons why people commit suicide significantly more in the 1st world than the 3rd world. Results of the such researches might then be used by the government officials to help lessen the suicide numbers in their respective country. 
+
+# References
+
+[1] H. Schumacher, "Why more men than women die by suicide", Bbc.com, 2019. [Online]. Available: https://www.bbc.com/future/article/20190313-why-more-men-kill-themselves-than-women. [Accessed: 20- Dec- 2019].
+
+
+
